@@ -3,7 +3,7 @@ use mockito::Server;
 
 #[tokio::test]
 async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
-    let mut server = Server::new();
+    let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/stations")
         .with_body(
@@ -51,7 +51,7 @@ async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
 
 #[tokio::test]
 async fn test_empty_station() -> Result<(), amtrak_api::errors::Error> {
-    let mut server = Server::new();
+    let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/stations/ABC")
         .with_body("[]")
