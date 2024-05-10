@@ -14,6 +14,9 @@ multiple datetime formats, etc).
 //!
 //! This example shows how to filter trains based on the route name and then
 //! determine what station the train is currently in route to.
+use amtrak_api::{Client, TrainStatus};
+use chrono::{Local, Utc};
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Client::new()
