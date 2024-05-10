@@ -1,9 +1,9 @@
-use amtrak_api::{responses::TrainStatus, Client};
+use amtrak_api::{Client, TrainStatus};
 use chrono::{FixedOffset, NaiveDate};
 use mockito::Server;
 
 #[tokio::test]
-async fn test_single_train() -> Result<(), amtrak_api::errors::Error> {
+async fn test_single_train() -> Result<(), amtrak_api::Error> {
     let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/trains")
@@ -332,7 +332,7 @@ async fn test_single_train() -> Result<(), amtrak_api::errors::Error> {
 }
 
 #[tokio::test]
-async fn test_empty_trains() -> Result<(), amtrak_api::errors::Error> {
+async fn test_empty_trains() -> Result<(), amtrak_api::Error> {
     let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/trains")

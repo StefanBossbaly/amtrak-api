@@ -2,7 +2,7 @@ use amtrak_api::Client;
 use mockito::Server;
 
 #[tokio::test]
-async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
+async fn test_single_station() -> Result<(), amtrak_api::Error> {
     let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/stations")
@@ -50,7 +50,7 @@ async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
 }
 
 #[tokio::test]
-async fn test_empty_station() -> Result<(), amtrak_api::errors::Error> {
+async fn test_empty_station() -> Result<(), amtrak_api::Error> {
     let mut server = Server::new_async().await;
     let mock_server = server
         .mock("GET", "/stations/ABC")

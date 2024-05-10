@@ -2,7 +2,7 @@
 //!
 //! This example shows how to query for a single train based on the unique train
 //! id and then determine if it has stopped at 30th street station yet.
-use amtrak_api::{responses::TrainStatus, Client};
+use amtrak_api::{Client, TrainStatus};
 
 const TRAIN_ID: &str = "612-5";
 

@@ -37,8 +37,10 @@
 //! }
 //! ```
 
-pub mod client;
-pub mod errors;
-pub mod responses;
+mod client;
+mod errors;
+mod responses;
 
 pub use client::Client;
+pub use errors::Error;
+pub use responses::{Station, Train, TrainState, TrainStatus};

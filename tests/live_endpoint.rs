@@ -1,7 +1,7 @@
 use amtrak_api::Client;
 
 #[tokio::test]
-async fn test_live_train_api() -> Result<(), amtrak_api::errors::Error> {
+async fn test_live_train_api() -> Result<(), amtrak_api::Error> {
     let client = Client::new();
     let response = client.trains().await?;
 
@@ -13,7 +13,7 @@ async fn test_live_train_api() -> Result<(), amtrak_api::errors::Error> {
 }
 
 #[tokio::test]
-async fn test_live_station_api() -> Result<(), amtrak_api::errors::Error> {
+async fn test_live_station_api() -> Result<(), amtrak_api::Error> {
     let client = Client::new();
     let response = client.stations().await?;
 

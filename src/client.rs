@@ -83,7 +83,7 @@ impl Client {
     /// # Example
     ///
     /// ```rust
-    /// use amtrak_api::{responses::TrainStatus, Client};
+    /// use amtrak_api::{Client, TrainStatus};
     /// use chrono::{Local, Utc};
     ///
     /// #[tokio::main]
@@ -166,7 +166,7 @@ impl Client {
     /// # Example
     ///
     /// ```rust
-    /// use amtrak_api::{responses::TrainStatus, Client};
+    /// use amtrak_api::{Client, TrainStatus};
     ///
     /// const TRAIN_ID: &str = "612-5";
     ///
