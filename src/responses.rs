@@ -4,19 +4,36 @@ use chrono::{DateTime, FixedOffset};
 use serde::{de, Deserialize};
 
 /// The response from the `/trains` or `/trains/{:train_id}` endpoint.
+///
+/// Each key in the hashmap is the string representation of the
+/// [`train_num`] field. The value is a list of trains that have the
+/// specified [`train_num`] field. I have not seen an instance where
+/// multiple trains have the same [`train_num`] and therefore each list
+/// in the map has only one item. It is possible for multiple trains to
+/// have the same [`train_num`] so that case must be handled in the
+/// client code.
+///
+/// [`train_num`]: Train::train_num
+pub type TrainResponse = HashMap<String, Vec<Train>>;
+
+/// The response from the `/trains` or `/trains/{:train_id}` endpoint.
+///
+/// We have to wrap this in a structure so that we can implement the
+/// Deserialize trait for it.
 #[derive(Debug, Clone)]
-pub struct TrainResponse(
-    /// Each key in the hashmap is the string representation of the
-    /// [`train_num`] field. The value is a list of trains that have the
-    /// specified [`train_num`] field. I have not seen an instance where
-    /// multiple trains have the same [`train_num`] and therefore each list
-    /// in the map has only one item. It is possible for multiple trains to
-    /// have the same [`train_num`] so that case must be handled in the
-    /// client code.
-    ///
-    /// [`train_num`]: Train::train_num
-    pub HashMap<String, Vec<Train>>,
+pub(crate) struct TrainResponseWrapper(
+    /// The actual response from the Amtrak API
+    pub(crate) TrainResponse,
 );
+
+impl<'de> Deserialize<'de> for TrainResponseWrapper {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        deserializer.deserialize_any(TrainResponseWrapperVisitor)
+    }
+}
 
 /// Custom visitor used to deserialize responses from the `/trains` or
 /// `/trains/{:train_id}` endpoint.
@@ -27,10 +44,10 @@ pub struct TrainResponse(
 /// (rightfully) expects the type to be the same for every endpoint response. To
 /// handle this discrepancy, we implement our own visitor which will handle both
 /// response.
-struct TrainResponseVisitor;
+struct TrainResponseWrapperVisitor;
 
-impl<'de> de::Visitor<'de> for TrainResponseVisitor {
-    type Value = TrainResponse;
+impl<'de> de::Visitor<'de> for TrainResponseWrapperVisitor {
+    type Value = TrainResponseWrapper;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("a HashMap or an empty array")
@@ -40,7 +57,7 @@ impl<'de> de::Visitor<'de> for TrainResponseVisitor {
     where
         A: de::MapAccess<'de>,
     {
-        Ok(TrainResponse(Deserialize::deserialize(
+        Ok(TrainResponseWrapper(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
         )?))
     }
@@ -49,16 +66,7 @@ impl<'de> de::Visitor<'de> for TrainResponseVisitor {
     where
         A: de::SeqAccess<'de>,
     {
-        Ok(TrainResponse(HashMap::new()))
-    }
-}
-
-impl<'de> Deserialize<'de> for TrainResponse {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: de::Deserializer<'de>,
-    {
-        deserializer.deserialize_any(TrainResponseVisitor)
+        Ok(TrainResponseWrapper(HashMap::new()))
     }
 }
 
@@ -395,16 +403,33 @@ pub enum TrainState {
 }
 
 /// The response from the `/stations` or `/stations/{:station_code}` endpoint.
+///
+/// Each key in the hashmap is the unique station code which will match the
+/// [`code`] field. The value is the [`Station`] structure that is
+/// associated with the unique station [`code`].
+///
+/// [`code`]: Station::code
+/// [`Station`]: Station
+pub type StationResponse = HashMap<String, Station>;
+
+/// The response from the `/stations` or `/stations/{:station_code}` endpoint.
+///
+/// We have to wrap this in a structure so that we can implement the
+/// Deserialize trait for it.
 #[derive(Debug, Clone)]
-pub struct StationResponse(
-    /// Each key in the hashmap is the unique station code which will match the
-    /// [`code`] field. The value is the [`Station`] structure that is
-    /// associated with the unique station [`code`].
-    ///
-    /// [`code`]: Station::code
-    /// [`Station`]: Station
-    pub HashMap<String, Station>,
+pub(crate) struct StationResponseWrapper(
+    /// The actual response from the Amtrak API
+    pub(crate) HashMap<String, Station>,
 );
+
+impl<'de> Deserialize<'de> for StationResponseWrapper {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        deserializer.deserialize_any(StationResponseWrapperVisitor)
+    }
+}
 
 /// Custom visitor used to deserialize responses from the `/stations` or
 /// `/stations/{:station_code}` endpoint.
@@ -415,10 +440,10 @@ pub struct StationResponse(
 /// (rightfully) expects the type to be the same for every endpoint response. To
 /// handle this discrepancy, we implement our own visitor which will handle both
 /// response.
-struct StationResponseVisitor;
+struct StationResponseWrapperVisitor;
 
-impl<'de> de::Visitor<'de> for StationResponseVisitor {
-    type Value = StationResponse;
+impl<'de> de::Visitor<'de> for StationResponseWrapperVisitor {
+    type Value = StationResponseWrapper;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_str("a HashMap or an empty array")
@@ -428,7 +453,7 @@ impl<'de> de::Visitor<'de> for StationResponseVisitor {
     where
         A: de::MapAccess<'de>,
     {
-        Ok(StationResponse(Deserialize::deserialize(
+        Ok(StationResponseWrapper(Deserialize::deserialize(
             de::value::MapAccessDeserializer::new(map),
         )?))
     }
@@ -437,16 +462,7 @@ impl<'de> de::Visitor<'de> for StationResponseVisitor {
     where
         A: de::SeqAccess<'de>,
     {
-        Ok(StationResponse(HashMap::new()))
-    }
-}
-
-impl<'de> Deserialize<'de> for StationResponse {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: de::Deserializer<'de>,
-    {
-        deserializer.deserialize_any(StationResponseVisitor)
+        Ok(StationResponseWrapper(HashMap::new()))
     }
 }
 

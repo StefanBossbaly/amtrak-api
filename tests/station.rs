@@ -30,9 +30,9 @@ async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
     let client = Client::with_base_url(server.url().as_str());
     let response = client.stations().await?;
 
-    assert_eq!(response.0.len(), 1);
+    assert_eq!(response.len(), 1);
 
-    let station = response.0.get("ABE").unwrap();
+    let station = response.get("ABE").unwrap();
     assert_eq!(station.name, "Aberdeen");
     assert_eq!(station.code, "ABE");
     assert_eq!(station.lat, 39.508447);
@@ -60,7 +60,7 @@ async fn test_empty_station() -> Result<(), amtrak_api::errors::Error> {
     let client = Client::with_base_url(server.url().as_str());
     let response = client.station("ABC").await?;
 
-    assert_eq!(response.0.len(), 0);
+    assert_eq!(response.len(), 0);
 
     mock_server.assert_async().await;
 

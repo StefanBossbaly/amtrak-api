@@ -10,7 +10,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Client::new()
         .trains()
         .await?
-        .0
         .into_iter()
         .flat_map(|(_, trains)| {
             trains

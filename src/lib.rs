@@ -24,7 +24,6 @@
 //!     Client::new()
 //!         .station(STATION_CODE)
 //!         .await?
-//!         .0
 //!         .values()
 //!         .for_each(|station| {
 //!             println!(

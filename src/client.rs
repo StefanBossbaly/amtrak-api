@@ -91,7 +91,6 @@ impl Client {
     ///     Client::new()
     ///         .trains()
     ///         .await?
-    ///         .0
     ///         .into_iter()
     ///         .flat_map(|(_, trains)| {
     ///             trains
@@ -145,10 +144,10 @@ impl Client {
             .get(url)
             .send()
             .await?
-            .json::<responses::TrainResponse>()
+            .json::<responses::TrainResponseWrapper>()
             .await?;
 
-        Ok(response)
+        Ok(response.0)
     }
 
     /// Returns the specified train(s) being tracked by Amtrak
@@ -177,7 +176,7 @@ impl Client {
     ///
     ///     // Attempt to query the status of the "612-5" train
     ///     let response = client.train(TRAIN_ID).await?;
-    ///     let train_612_5 = response.0.get(TRAIN_ID);
+    ///     let train_612_5 = response.get(TRAIN_ID);
     ///
     ///     match train_612_5 {
     ///         Some(trains) => match trains.len() {
@@ -234,10 +233,10 @@ impl Client {
             .get(url)
             .send()
             .await?
-            .json::<responses::TrainResponse>()
+            .json::<responses::TrainResponseWrapper>()
             .await?;
 
-        Ok(response)
+        Ok(response.0)
     }
 
     /// Returns all the stations in the Amtrak network
@@ -258,7 +257,6 @@ impl Client {
     ///     Client::new()
     ///         .stations()
     ///         .await?
-    ///         .0
     ///         .values()
     ///         .filter(|station| station.state == "PA")
     ///         .for_each(|station| {
@@ -277,10 +275,10 @@ impl Client {
             .get(url)
             .send()
             .await?
-            .json::<responses::StationResponse>()
+            .json::<responses::StationResponseWrapper>()
             .await?;
 
-        Ok(response)
+        Ok(response.0)
     }
 
     /// Returns the specified station in the Amtrak network
@@ -307,7 +305,6 @@ impl Client {
     ///     Client::new()
     ///         .station(STATION_CODE)
     ///         .await?
-    ///         .0
     ///         .values()
     ///         .for_each(|station| {
     ///             println!(
@@ -333,9 +330,9 @@ impl Client {
             .get(url)
             .send()
             .await?
-            .json::<responses::StationResponse>()
+            .json::<responses::StationResponseWrapper>()
             .await?;
 
-        Ok(response)
+        Ok(response.0)
     }
 }

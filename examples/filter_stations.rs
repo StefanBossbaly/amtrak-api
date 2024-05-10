@@ -8,7 +8,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Client::new()
         .stations()
         .await?
-        .0
         .values()
         .filter(|station| station.state == "PA")
         .for_each(|station| {

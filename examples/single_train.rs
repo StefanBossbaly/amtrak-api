@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Attempt to query the status of the "612-5" train
     let response = client.train(TRAIN_ID).await?;
-    let train_612_5 = response.0.get(TRAIN_ID);
+    let train_612_5 = response.get(TRAIN_ID);
 
     match train_612_5 {
         Some(trains) => match trains.len() {

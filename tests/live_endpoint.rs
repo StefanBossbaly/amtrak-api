@@ -5,7 +5,7 @@ async fn test_live_train_api() -> Result<(), amtrak_api::errors::Error> {
     let client = Client::new();
     let response = client.trains().await?;
 
-    for (train_num, _) in response.0.iter() {
+    for (train_num, _) in response.iter() {
         client.train(train_num).await?;
     }
 
@@ -17,7 +17,7 @@ async fn test_live_station_api() -> Result<(), amtrak_api::errors::Error> {
     let client = Client::new();
     let response = client.stations().await?;
 
-    for (station_code, _) in response.0.iter() {
+    for (station_code, _) in response.iter() {
         client.station(station_code).await?;
     }
 
