@@ -75,7 +75,7 @@ pub struct Train {
 
     /// The (possible unique) number identifying the train.
     #[serde(rename = "trainNum")]
-    pub train_num: u32,
+    pub train_num: String,
 
     /// The concatenation of the [`train_num`] with another number (not sure
     /// what exactly) in the format "{:train_num}-{:instance}".
@@ -511,7 +511,7 @@ pub struct Station {
     /// # Examples:
     /// * `19104`
     /// * `10001`
-    pub zip: String,
+    pub zip: u32,
 
     /// A list of current [`train_id`] that have departed from or are enroute to
     /// this station.

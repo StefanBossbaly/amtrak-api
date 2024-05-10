@@ -13,7 +13,7 @@ async fn test_single_train() -> Result<(), amtrak_api::errors::Error> {
     "657": [
         {
             "routeName": "Keystone",
-            "trainNum": 657,
+            "trainNum": "657",
             "trainID": "657-30",
             "lat": 40.14815944794739,
             "lon": -76.61796031144218,
@@ -274,7 +274,7 @@ async fn test_single_train() -> Result<(), amtrak_api::errors::Error> {
     let train = trains.get(0).unwrap();
 
     assert_eq!(train.route_name, "Keystone");
-    assert_eq!(train.train_num, 657);
+    assert_eq!(train.train_num, "657");
     assert_eq!(train.lat, 40.14815944794739);
     assert_eq!(train.lon, -76.61796031144218);
     assert_eq!(train.train_timely, "NaN Minutes Early");

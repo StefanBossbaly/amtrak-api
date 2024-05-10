@@ -224,8 +224,11 @@ impl Client {
     /// [`TrainResponse`]: responses::TrainResponse
     /// [`train_id`]: responses::Train::train_id
     /// [`train_num`]: responses::Train::train_num
-    pub async fn train(&self, train_identifier: &str) -> Result<responses::TrainResponse> {
-        let url = format!("{}/trains/{}", self.base_url, train_identifier);
+    pub async fn train<S: AsRef<str>>(
+        &self,
+        train_identifier: S,
+    ) -> Result<responses::TrainResponse> {
+        let url = format!("{}/trains/{}", self.base_url, train_identifier.as_ref());
 
         let response = reqwest::Client::new()
             .get(url)
@@ -320,8 +323,11 @@ impl Client {
     ///
     /// [`StationResponse`]: responses::StationResponse
     /// [`code`]: responses::TrainStation::code
-    pub async fn station(&self, station_code: &str) -> Result<responses::StationResponse> {
-        let url = format!("{}/stations/{}", self.base_url, station_code);
+    pub async fn station<S: AsRef<str>>(
+        &self,
+        station_code: S,
+    ) -> Result<responses::StationResponse> {
+        let url = format!("{}/stations/{}", self.base_url, station_code.as_ref());
 
         let response = reqwest::Client::new()
             .get(url)

@@ -19,7 +19,7 @@ async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
         "address2": " ",
         "city": "Aberdeen",
         "state": "MD",
-        "zip": "21001",
+        "zip": 21001,
         "trains": []
     }
 }"#,
@@ -41,7 +41,7 @@ async fn test_single_station() -> Result<(), amtrak_api::errors::Error> {
     assert_eq!(station.address2, " ");
     assert_eq!(station.city, "Aberdeen");
     assert_eq!(station.state, "MD");
-    assert_eq!(station.zip, "21001");
+    assert_eq!(station.zip, 21001);
     assert_eq!(station.trains.len(), 0);
 
     mock_server.assert_async().await;
