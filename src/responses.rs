@@ -520,6 +520,7 @@ pub struct Station {
     /// # Examples:
     /// * `PA`
     /// * `NY`
+    /// * `ON` (Canadian province)
     pub state: String,
 
     /// The zip code of the station
@@ -527,7 +528,8 @@ pub struct Station {
     /// # Examples:
     /// * `19104`
     /// * `10001`
-    pub zip: u32,
+    /// * `L7T 4A8` (Canadian zip code)
+    pub zip: String,
 
     /// A list of current [`train_id`] that have departed from or are enroute to
     /// this station.
