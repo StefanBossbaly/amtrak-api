@@ -70,6 +70,50 @@ impl<'de> de::Visitor<'de> for TrainResponseWrapperVisitor {
     }
 }
 
+/// Custom visitor used to deserialize the [`zip`] field in the [`Station`] struct.
+///
+/// The Amtrak API will sometimes serialize the zip code as an integer and
+/// sometimes as a string. This visitor will handle both cases.
+///
+/// [`zip`]: Station::zip
+struct ZipCodeVisitor;
+
+impl<'de> de::Visitor<'de> for ZipCodeVisitor {
+    type Value = String;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a string or an integer")
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(v.to_string())
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(v.to_string())
+    }
+
+    fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(v.to_string())
+    }
+}
+
+fn deserialize_zip_code<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: de::Deserializer<'de>,
+{
+    deserializer.deserialize_any(ZipCodeVisitor)
+}
+
 /// Represents an Amtrak train
 #[derive(Debug, Deserialize, Clone)]
 pub struct Train {
@@ -529,6 +573,7 @@ pub struct Station {
     /// * `19104`
     /// * `10001`
     /// * `L7T 4A8` (Canadian zip code)
+    #[serde(deserialize_with = "deserialize_zip_code")]
     pub zip: String,
 
     /// A list of current [`train_id`] that have departed from or are enroute to
