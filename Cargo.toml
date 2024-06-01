@@ -21,6 +21,8 @@ thiserror = "1.0.60"
 [dev-dependencies]
 mockito = "1.4.0"
 tokio = { version = "1.37.0", features = ["full"] }
+serde_path_to_error = "0.1.16"
+anyhow = "1.0.86"
 
 [[example]]
 name = "filter_stations"

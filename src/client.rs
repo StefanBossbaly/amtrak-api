@@ -150,6 +150,39 @@ impl Client {
         Ok(response.0)
     }
 
+    /// Same as [`trains`] but using `serde_path_to_error` as the deserialize adapter
+    ///
+    /// Used for debugging purposes only and should not be used in production
+    ///
+    /// [`trains`]: Client::trains
+    #[cfg(test)]
+    pub async fn trains_with_debugging(&self) -> anyhow::Result<responses::TrainResponse> {
+        use anyhow::anyhow;
+
+        let url = format!("{}/trains", self.base_url);
+
+        let bytes = reqwest::Client::new()
+            .get(url)
+            .send()
+            .await?
+            .bytes()
+            .await?;
+
+        let response: responses::TrainResponseWrapper = serde_path_to_error::deserialize(
+            &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
+        )
+        .map_err(|err| {
+            let path = err.path().to_string();
+            anyhow!(
+                "Error deserializing TrainResponseWrapper: {}: {}",
+                path,
+                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
+            )
+        })?;
+
+        Ok(response.0)
+    }
+
     /// Returns the specified train(s) being tracked by Amtrak
     ///
     /// This function calls into the `/trains/{:train_id}` endpoint.
@@ -239,6 +272,42 @@ impl Client {
         Ok(response.0)
     }
 
+    /// Same as [`train`] but using `serde_path_to_error` as the deserialize adapter
+    ///
+    /// Used for debugging purposes only and should not be used in production
+    ///
+    /// [`train`]: Client::train
+    #[cfg(test)]
+    pub async fn train_with_debugging<S: AsRef<str>>(
+        &self,
+        train_identifier: S,
+    ) -> anyhow::Result<responses::TrainResponse> {
+        use anyhow::anyhow;
+
+        let url = format!("{}/trains/{}", self.base_url, train_identifier.as_ref());
+
+        let bytes = reqwest::Client::new()
+            .get(url)
+            .send()
+            .await?
+            .bytes()
+            .await?;
+
+        let response: responses::TrainResponseWrapper = serde_path_to_error::deserialize(
+            &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
+        )
+        .map_err(|err| {
+            let path = err.path().to_string();
+            anyhow!(
+                "Error deserializing TrainResponseWrapper: {}: {}",
+                path,
+                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
+            )
+        })?;
+
+        Ok(response.0)
+    }
+
     /// Returns all the stations in the Amtrak network
     ///
     /// This function calls into the `/stations` endpoint.
@@ -277,6 +346,39 @@ impl Client {
             .await?
             .json::<responses::StationResponseWrapper>()
             .await?;
+
+        Ok(response.0)
+    }
+
+    /// Same as [`stations`] but using `serde_path_to_error` as the deserialize adapter
+    ///
+    /// Used for debugging purposes only and should not be used in production
+    ///
+    /// [`stations`]: Client::stations
+    #[cfg(test)]
+    pub async fn stations_with_debugging(&self) -> anyhow::Result<responses::StationResponse> {
+        use anyhow::anyhow;
+
+        let url = format!("{}/stations", self.base_url);
+
+        let bytes = reqwest::Client::new()
+            .get(url)
+            .send()
+            .await?
+            .bytes()
+            .await?;
+
+        let response: responses::StationResponseWrapper = serde_path_to_error::deserialize(
+            &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
+        )
+        .map_err(|err| {
+            let path = err.path().to_string();
+            anyhow!(
+                "Error deserializing StationResponseWrapper: {}: {}",
+                path,
+                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
+            )
+        })?;
 
         Ok(response.0)
     }
@@ -334,5 +436,74 @@ impl Client {
             .await?;
 
         Ok(response.0)
+    }
+
+    /// Same as [`station`] but using `serde_path_to_error` as the deserialize adapter
+    ///
+    /// Used for debugging purposes only and should not be used in production
+    ///
+    /// [`station`]: Client::station
+    #[cfg(test)]
+    pub async fn station_with_debugging<S: AsRef<str>>(
+        &self,
+        station_code: S,
+    ) -> anyhow::Result<responses::StationResponse> {
+        use anyhow::anyhow;
+
+        let url = format!("{}/stations/{}", self.base_url, station_code.as_ref());
+
+        let bytes = reqwest::Client::new()
+            .get(url)
+            .send()
+            .await?
+            .bytes()
+            .await?;
+
+        let response: responses::StationResponseWrapper = serde_path_to_error::deserialize(
+            &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
+        )
+        .map_err(|err| {
+            let path = err.path().to_string();
+            anyhow!(
+                "Error deserializing StationResponseWrapper: {}: {}",
+                path,
+                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
+            )
+        })?;
+
+        Ok(response.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Test the live train endpoint using serde_path_to_error as the deserialize driver
+    ///
+    /// This test will call the live train endpoint to list all the trains that are currently
+    /// in the system. We do not test for correct deserialization since we do not have truth
+    /// data to compare against, we are just ensuring that we can deserialize the response
+    /// provided by the Amtrak API.
+    #[tokio::test]
+    async fn test_live_train_api() -> anyhow::Result<()> {
+        let client = Client::new();
+        let _ = client.trains_with_debugging().await?;
+
+        Ok(())
+    }
+
+    /// Test the live station endpoint using serde_path_to_error as the deserialize driver
+    ///
+    /// This test will call the live station endpoint to list all the stations that are currently
+    /// in the system. We do not test for correct deserialization since we do not have truth
+    /// data to compare against, we are just ensuring that we can deserialize the response
+    /// provided by the Amtrak API.
+    #[tokio::test]
+    async fn test_live_station_api() -> anyhow::Result<()> {
+        let client = Client::new();
+        let _ = client.stations_with_debugging().await?;
+
+        Ok(())
     }
 }
