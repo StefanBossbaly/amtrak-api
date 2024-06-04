@@ -6,6 +6,8 @@
   ],
   "settings": {
     "rust-analyzer.check.command": "clippy",
+    "rust-analyzer.cargo.features": ["", "serde_debugging"],
+    "rust-analyzer.check.features": ["", "serde_debugging"],
     "editor.formatOnSave": true
   },
   "launch": {

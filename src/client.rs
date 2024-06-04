@@ -10,6 +10,9 @@ const BASE_API_URL: &str = "https://api-v3.amtraker.com/v3";
 
 pub type Result<T> = std::result::Result<T, errors::Error>;
 
+#[cfg(feature = "serde_debugging")]
+pub type DebuggingResult<T> = std::result::Result<T, errors::DebuggingError>;
+
 /// A client instance
 ///
 /// Note: This does not represent an active connection. Connections are
@@ -150,15 +153,18 @@ impl Client {
         Ok(response.0)
     }
 
-    /// Same as [`trains`] but using `serde_path_to_error` as the deserialize adapter
+    /// Same as [`trains`] but using [`serde_path_to_error`] as the deserialize adapter
     ///
-    /// Used for debugging purposes only and should not be used in production
+    /// Note: This function will will return [`Error::Other`] instead of [`Error::DeserializeFailed`]
+    /// when a deserialization error occurs. The reason for this is that we want to log the offending
+    /// JSON when a deserialization error does occur and will use the [`anyhow`] crate to include the
+    /// JSON and failed field path to make debugging a lot easier.
     ///
     /// [`trains`]: Client::trains
-    #[cfg(test)]
-    pub async fn trains_with_debugging(&self) -> anyhow::Result<responses::TrainResponse> {
-        use anyhow::anyhow;
-
+    /// [`Error::Other`]: errors::Error::Other
+    /// [`Error::DeserializeFailed`]: errors::Error::DeserializeFailed
+    #[cfg(feature = "serde_debugging")]
+    pub async fn trains_with_debugging(&self) -> DebuggingResult<responses::TrainResponse> {
         let url = format!("{}/trains", self.base_url);
 
         let bytes = reqwest::Client::new()
@@ -171,13 +177,11 @@ impl Client {
         let response: responses::TrainResponseWrapper = serde_path_to_error::deserialize(
             &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
         )
-        .map_err(|err| {
-            let path = err.path().to_string();
-            anyhow!(
-                "Error deserializing TrainResponseWrapper: {}: {}",
-                path,
-                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
-            )
+        .map_err(|err| errors::DebuggingError::DeserializeFailed {
+            error: err,
+            response: std::str::from_utf8(bytes.as_ref())
+                .unwrap_or("Failed to convert bytes to string")
+                .to_string(),
         })?;
 
         Ok(response.0)
@@ -256,10 +260,10 @@ impl Client {
     /// [`TrainResponse`]: responses::TrainResponse
     /// [`train_id`]: responses::Train::train_id
     /// [`train_num`]: responses::Train::train_num
-    pub async fn train<S: AsRef<str>>(
-        &self,
-        train_identifier: S,
-    ) -> Result<responses::TrainResponse> {
+    pub async fn train<S>(&self, train_identifier: S) -> Result<responses::TrainResponse>
+    where
+        S: AsRef<str>,
+    {
         let url = format!("{}/trains/{}", self.base_url, train_identifier.as_ref());
 
         let response = reqwest::Client::new()
@@ -272,18 +276,24 @@ impl Client {
         Ok(response.0)
     }
 
-    /// Same as [`train`] but using `serde_path_to_error` as the deserialize adapter
+    /// Same as [`train`] but using [`serde_path_to_error`] as the deserialize adapter
     ///
-    /// Used for debugging purposes only and should not be used in production
+    /// Note: This function will will return [`Error::Other`] instead of [`Error::DeserializeFailed`]
+    /// when a deserialization error occurs. The reason for this is that we want to log the offending
+    /// JSON when a deserialization error does occur and will use the [`anyhow`] crate to include the
+    /// JSON and failed field path to make debugging a lot easier.
     ///
     /// [`train`]: Client::train
-    #[cfg(test)]
-    pub async fn train_with_debugging<S: AsRef<str>>(
+    /// [`Error::Other`]: errors::Error::Other
+    /// [`Error::DeserializeFailed`]: errors::Error::DeserializeFailed
+    #[cfg(feature = "serde_debugging")]
+    pub async fn train_with_debugging<S>(
         &self,
         train_identifier: S,
-    ) -> anyhow::Result<responses::TrainResponse> {
-        use anyhow::anyhow;
-
+    ) -> DebuggingResult<responses::TrainResponse>
+    where
+        S: AsRef<str>,
+    {
         let url = format!("{}/trains/{}", self.base_url, train_identifier.as_ref());
 
         let bytes = reqwest::Client::new()
@@ -296,13 +306,11 @@ impl Client {
         let response: responses::TrainResponseWrapper = serde_path_to_error::deserialize(
             &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
         )
-        .map_err(|err| {
-            let path = err.path().to_string();
-            anyhow!(
-                "Error deserializing TrainResponseWrapper: {}: {}",
-                path,
-                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
-            )
+        .map_err(|err| errors::DebuggingError::DeserializeFailed {
+            error: err,
+            response: std::str::from_utf8(bytes.as_ref())
+                .unwrap_or("Failed to convert bytes to string")
+                .to_string(),
         })?;
 
         Ok(response.0)
@@ -350,15 +358,18 @@ impl Client {
         Ok(response.0)
     }
 
-    /// Same as [`stations`] but using `serde_path_to_error` as the deserialize adapter
+    /// Same as [`stations`] but using [`serde_path_to_error`] as the deserialize adapter
     ///
-    /// Used for debugging purposes only and should not be used in production
+    /// Note: This function will will return [`Error::Other`] instead of [`Error::DeserializeFailed`]
+    /// when a deserialization error occurs. The reason for this is that we want to log the offending
+    /// JSON when a deserialization error does occur and will use the [`anyhow`] crate to include the
+    /// JSON and failed field path to make debugging a lot easier.
     ///
     /// [`stations`]: Client::stations
-    #[cfg(test)]
-    pub async fn stations_with_debugging(&self) -> anyhow::Result<responses::StationResponse> {
-        use anyhow::anyhow;
-
+    /// [`Error::Other`]: errors::Error::Other
+    /// [`Error::DeserializeFailed`]: errors::Error::DeserializeFailed
+    #[cfg(feature = "serde_debugging")]
+    pub async fn stations_with_debugging(&self) -> DebuggingResult<responses::StationResponse> {
         let url = format!("{}/stations", self.base_url);
 
         let bytes = reqwest::Client::new()
@@ -371,13 +382,11 @@ impl Client {
         let response: responses::StationResponseWrapper = serde_path_to_error::deserialize(
             &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
         )
-        .map_err(|err| {
-            let path = err.path().to_string();
-            anyhow!(
-                "Error deserializing StationResponseWrapper: {}: {}",
-                path,
-                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
-            )
+        .map_err(|err| errors::DebuggingError::DeserializeFailed {
+            error: err,
+            response: std::str::from_utf8(bytes.as_ref())
+                .unwrap_or("Failed to convert bytes to string")
+                .to_string(),
         })?;
 
         Ok(response.0)
@@ -422,10 +431,10 @@ impl Client {
     ///
     /// [`StationResponse`]: responses::StationResponse
     /// [`code`]: responses::TrainStation::code
-    pub async fn station<S: AsRef<str>>(
-        &self,
-        station_code: S,
-    ) -> Result<responses::StationResponse> {
+    pub async fn station<S>(&self, station_code: S) -> Result<responses::StationResponse>
+    where
+        S: AsRef<str>,
+    {
         let url = format!("{}/stations/{}", self.base_url, station_code.as_ref());
 
         let response = reqwest::Client::new()
@@ -438,18 +447,24 @@ impl Client {
         Ok(response.0)
     }
 
-    /// Same as [`station`] but using `serde_path_to_error` as the deserialize adapter
+    /// Same as [`station`] but using [`serde_path_to_error`] as the deserialize adapter
     ///
-    /// Used for debugging purposes only and should not be used in production
+    /// Note: This function will will return [`Error::Other`] instead of [`Error::DeserializeFailed`]
+    /// when a deserialization error occurs. The reason for this is that we want to log the offending
+    /// JSON when a deserialization error does occur and will use the [`anyhow`] crate to include the
+    /// JSON and failed field path to make debugging a lot easier.
     ///
     /// [`station`]: Client::station
-    #[cfg(test)]
-    pub async fn station_with_debugging<S: AsRef<str>>(
+    /// [`Error::Other`]: errors::Error::Other
+    /// [`Error::DeserializeFailed`]: errors::Error::DeserializeFailed
+    #[cfg(feature = "serde_debugging")]
+    pub async fn station_with_debugging<S>(
         &self,
         station_code: S,
-    ) -> anyhow::Result<responses::StationResponse> {
-        use anyhow::anyhow;
-
+    ) -> DebuggingResult<responses::StationResponse>
+    where
+        S: AsRef<str>,
+    {
         let url = format!("{}/stations/{}", self.base_url, station_code.as_ref());
 
         let bytes = reqwest::Client::new()
@@ -462,48 +477,13 @@ impl Client {
         let response: responses::StationResponseWrapper = serde_path_to_error::deserialize(
             &mut serde_json::Deserializer::from_slice(bytes.as_ref()),
         )
-        .map_err(|err| {
-            let path = err.path().to_string();
-            anyhow!(
-                "Error deserializing StationResponseWrapper: {}: {}",
-                path,
-                std::str::from_utf8(bytes.as_ref()).unwrap_or("Failed to convert bytes to string")
-            )
+        .map_err(|err| errors::DebuggingError::DeserializeFailed {
+            error: err,
+            response: std::str::from_utf8(bytes.as_ref())
+                .unwrap_or("Failed to convert bytes to string")
+                .to_string(),
         })?;
 
         Ok(response.0)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// Test the live train endpoint using serde_path_to_error as the deserialize driver
-    ///
-    /// This test will call the live train endpoint to list all the trains that are currently
-    /// in the system. We do not test for correct deserialization since we do not have truth
-    /// data to compare against, we are just ensuring that we can deserialize the response
-    /// provided by the Amtrak API.
-    #[tokio::test]
-    async fn test_live_train_api() -> anyhow::Result<()> {
-        let client = Client::new();
-        let _ = client.trains_with_debugging().await?;
-
-        Ok(())
-    }
-
-    /// Test the live station endpoint using serde_path_to_error as the deserialize driver
-    ///
-    /// This test will call the live station endpoint to list all the stations that are currently
-    /// in the system. We do not test for correct deserialization since we do not have truth
-    /// data to compare against, we are just ensuring that we can deserialize the response
-    /// provided by the Amtrak API.
-    #[tokio::test]
-    async fn test_live_station_api() -> anyhow::Result<()> {
-        let client = Client::new();
-        let _ = client.stations_with_debugging().await?;
-
-        Ok(())
     }
 }

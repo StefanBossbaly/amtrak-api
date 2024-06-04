@@ -77,6 +77,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 662-27 train is heading to New York Penn, currently enroute to Parkesburg with an ETA of 2 minutes
 ```
 
+## Features
+
+- `serde_debugging` (Disabled by default): Enables the the following functions:
+  `trains_with_debugging`, `train_with_debugging`, `stations_with_debugging`,
+  `station_with_debugging`. These functions will operate the exact same way as
+  their counterparts with the exception that deserialization is completed using
+  [`serde_path_to_error`](https://crates.io/crates/serde_path_to_error) adapter.
+  This crate will print out the path of the offending field if deserialization
+  were to fail. The only quarky behavior is that instead of returning
+  `Error::DeserializeFailed`, the debugging functions will instead return
+  `Error:Other`. This is so that we can include the JSON response in the error
+  as well as the path to the field that caused the deserialization to fail,
+  making debugging a lot easier.
+
 ## Authors
 
 Stefan Bossbaly
