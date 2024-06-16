@@ -26,5 +26,5 @@ jobs:
 
       - name: Live Endpoint Test
         run: |
-          cargo check
-          cargo test --verbose --lib live
+          cargo check --features serde_debugging
+          cargo test --verbose --features serde_debugging --test live_endpoint_canary
