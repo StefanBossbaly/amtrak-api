@@ -49,3 +49,8 @@ jobs:
       - name: Build
         run: |
           cargo build --release
+
+      - name: Dry Publish
+        uses: katyo/publish-crates@v2
+        with:
+          dry-run: true
