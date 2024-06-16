@@ -20,16 +20,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v3
-        with:
-          lfs: "true"
+        uses: actions/checkout@v4
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ matrix.rust }}
-          override: true
           components: rustfmt, clippy
+
+      - name: Setup Rust Cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Display Toolchain Information
         run: |
