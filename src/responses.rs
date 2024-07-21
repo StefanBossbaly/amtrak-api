@@ -268,8 +268,17 @@ pub struct Train {
     pub last_value: DateTime<FixedOffset>,
 
     /// Unsure of what this field symbolizes.
+    ///
+    /// Note: Only provided if provider is "Amtrak"
     #[serde(rename = "objectID")]
-    pub object_id: u32,
+    pub object_id: Option<u32>,
+
+    /// The provider network of this information
+    ///
+    /// # Examples:
+    /// * `Amtrak`
+    /// * `Via`
+    pub provider: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]

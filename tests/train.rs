@@ -256,7 +256,8 @@ async fn test_single_train() -> Result<(), amtrak_api::Error> {
             "createdAt": "2023-08-29T23:39:50-04:00",
             "updatedAt": "2023-08-29T23:39:50-04:00",
             "lastValTS": "2023-08-29T23:39:34-04:00",
-            "objectID": 847
+            "objectID": 847,
+            "provider": "Amtrak"
         }
         ]
 }"#,
