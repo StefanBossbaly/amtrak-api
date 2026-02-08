@@ -285,7 +285,7 @@ async fn test_single_train() -> Result<(), amtrak_api::Error> {
     // Check the first station
     assert_eq!(train.stations[0].name, "New York Penn");
     assert_eq!(train.stations[0].code, "NYP");
-    assert_eq!(train.stations[0].tz, "America/New_York");
+    assert_eq!(train.stations[0].tz, Some("America/New_York".to_owned()));
     assert!(!train.stations[0].bus);
     assert_eq!(train.stations[0].schedule_arrival, {
         let tz = FixedOffset::east_opt(-4 * 3600).unwrap();

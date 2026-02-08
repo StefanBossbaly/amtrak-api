@@ -193,7 +193,7 @@ pub struct Train {
     /// * `America/New_York`
     /// * `America/Chicago`
     #[serde(rename = "originTZ")]
-    pub origin_tz: String,
+    pub origin_tz: Option<String>,
 
     /// The full human readable name of the station where the train originated
     /// from (aka the first station in this train's route).
@@ -219,7 +219,7 @@ pub struct Train {
     /// * `America/New_York`
     /// * `America/Chicago`
     #[serde(rename = "destTZ")]
-    pub destination_tz: String,
+    pub destination_tz: Option<String>,
 
     /// The full human readable name of the station where the train is heading
     /// (aka the final destination of the train).
@@ -298,7 +298,7 @@ pub struct TrainStation {
     pub code: String,
 
     /// The timezone of this station.
-    pub tz: String,
+    pub tz: Option<String>,
     pub bus: bool,
 
     /// The scheduled arrival time of this train for the current station.
